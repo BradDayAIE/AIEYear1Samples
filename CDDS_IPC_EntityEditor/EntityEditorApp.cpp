@@ -22,8 +22,8 @@ bool EntityEditorApp::Startup() {
 
 	srand(time(nullptr));
 	for (auto& entity : m_entities) {
-		entity.x = rand()%m_screenWidth;
-		entity.y = rand()%m_screenHeight;
+		entity.x = rand() % m_screenWidth;
+		entity.y = rand() % m_screenHeight;
 		entity.size = 10;
 		entity.speed = rand() % 100;
 		entity.rotation = rand() % 360;
@@ -31,7 +31,7 @@ bool EntityEditorApp::Startup() {
 		entity.g = rand() % 255;
 		entity.b = rand() % 255;
 	}
-	
+
 	return true;
 }
 
@@ -101,6 +101,15 @@ void EntityEditorApp::Update(float deltaTime) {
 		if (m_entities[i].y < 0)
 			m_entities[i].y += m_screenHeight;
 	}
+
+	fileHandle = CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(Entity), L"MySharedMemory");
+
+	Entity* entity = (Entity*)MapViewOfFile(fileHandle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Entity));
+
+	// close the shared file 
+	CloseHandle(fileHandle);
+	// unmap the memory block since we're done with it 
+	UnmapViewOfFile(data);
 }
 
 void EntityEditorApp::Draw() {
@@ -121,4 +130,9 @@ void EntityEditorApp::Draw() {
 	DrawText("Press ESC to quit", 630, 15, 12, LIGHTGRAY);
 
 	EndDrawing();
+}
+
+HANDLE EntityEditorApp::aCreateFileMapping()
+{
+	return CreateFileMapping(INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, sizeof(MyData), L"MySharedMemory");
 }

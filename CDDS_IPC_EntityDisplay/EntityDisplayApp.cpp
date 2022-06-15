@@ -22,7 +22,14 @@ void EntityDisplayApp::Shutdown() {
 }
 
 void EntityDisplayApp::Update(float deltaTime) {
+	fileHandle = OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"MySharedMemory");
 
+	Entity* data = (Entity*)MapViewOfFile(fileHandle, FILE_MAP_ALL_ACCESS, 0, 0, sizeof(Entity));
+
+	// close the shared file 
+	CloseHandle(fileHandle);
+	// unmap the memory block since we're done with it 
+	UnmapViewOfFile(data);
 }
 
 void EntityDisplayApp::Draw() {
@@ -43,4 +50,9 @@ void EntityDisplayApp::Draw() {
 	DrawText("Press ESC to quit", 630, 15, 12, LIGHTGRAY);
 
 	EndDrawing();
+}
+
+HANDLE EntityDisplayApp::aOpenFileMapping()
+{
+	return OpenFileMapping(FILE_MAP_ALL_ACCESS, FALSE, L"MySharedMemory");
 }
